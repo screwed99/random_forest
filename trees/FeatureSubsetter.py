@@ -15,5 +15,5 @@ class FeatureSubsetter:
         for x in range(num_features_to_return):
             i = random_state.rand_int(len(available_features))
             subset.append(available_features[i])
-            available_features = available_features.pop(i)
+            available_features.pop(i)
         return subset

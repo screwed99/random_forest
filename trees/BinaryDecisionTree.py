@@ -5,7 +5,7 @@ class BinaryDecisionTree:
         self._root = start_root
         self._max_height = 1
         self._used_features = set()
-        self._curr_leaf_nodes = {[self._root]}
+        self._curr_leaf_nodes = {self._root}
         self._feature_subsetter = feature_subsetter
 
     def predict_label(self, record):

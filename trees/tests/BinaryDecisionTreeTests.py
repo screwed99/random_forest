@@ -89,24 +89,21 @@ class BinaryDecisionTreeTests(unittest.TestCase):
         split_call1 = unittest.mock.call(mock_leaf_nodes1, allowed_features1)
         mock_node_split_result1 = unittest.mock.patch('trees.NodeSplitResult.NodeSplitResult',
                                                      autospec=True)
+        self.node_splitter.split.return_value = mock_node_split_result1
         best_node_before_split1 = unittest.mock.patch('trees.BinaryDecisionNode.BinaryDecisionNode',
                                                      autospec=True)
         best_node_after_split1 = unittest.mock.patch('trees.BinaryDecisionNode.BinaryDecisionNode',
                                                      autospec=True)
         mock_found_split1 = unittest.mock.PropertyMock(return_value=True)
+        update_leaf_call1 = unittest.mock.call(best_node_before_split1, best_node_after_split1)
         type(mock_node_split_result1).found_split = mock_found_split1
         type(mock_node_split_result1).best_node_before_split = best_node_before_split1
         type(mock_node_split_result1).best_node_after_split = best_node_after_split1
         type(best_node_before_split1).parent = None
-        update_leaf_call1 = unittest.mock.call(best_node_before_split1, best_node_after_split1)
-        mock_after_split_left_child1 = unittest.mock.patch('trees.BinaryDecisionNode.BinaryDecisionNode',
-                                                     autospec=True)
-        type(best_node_after_split1).left_child = mock_after_split_left_child1
         type(best_node_after_split1).split_feature = split_feature1
-        type(mock_after_split_left_child1).height = 2
-        self.node_splitter.split.return_value = mock_node_split_result1
+        type(best_node_after_split1).height = 2
 
-        split_succeeded = self.binary_decision_tree.try_add_best_split()
+        split_succeeded1 = self.binary_decision_tree.try_add_best_split()
 
         self.feature_subsetter.subset.assert_has_calls([subset_call1])
         self.leaf_nodes.get_leaf_nodes.assert_has_calls([get_leaf_nodes_call1])
@@ -114,11 +111,9 @@ class BinaryDecisionTreeTests(unittest.TestCase):
         mock_leaf_nodes1.assert_not_called()
         mock_found_split1.assert_called_once()
         self.leaf_nodes.update_leaf_node_split.assert_has_calls([update_leaf_call1])
-        self.assertTrue(split_succeeded)
+        self.assertTrue(split_succeeded1)
         self.assertEqual(self.binary_decision_tree.get_max_height(), 2)
 
-
-        """
         allowed_features2 = [split_feature2]
         used_features2 = {split_feature1}
         subset_call2 = unittest.mock.call(used_features2, self.random_state)
@@ -129,29 +124,34 @@ class BinaryDecisionTreeTests(unittest.TestCase):
         split_call2 = unittest.mock.call(mock_leaf_nodes2, allowed_features2)
         mock_node_split_result2 = unittest.mock.patch('trees.NodeSplitResult.NodeSplitResult',
                                                      autospec=True)
+        self.node_splitter.split.return_value = mock_node_split_result2
         best_node_before_split2 = unittest.mock.patch('trees.BinaryDecisionNode.BinaryDecisionNode',
                                                      autospec=True)
         best_node_after_split2 = unittest.mock.patch('trees.BinaryDecisionNode.BinaryDecisionNode',
                                                      autospec=True)
-        mock_node_split_result2.found_split.return_value = True
-        mock_node_split_result2.best_node_before_split.return_value = best_node_before_split2
-        mock_node_split_result2.best_node_after_split.return_value = best_node_after_split2
-        best_node_before_split1.parent.return_value = parent_of_split_node2
-        best_node_before_split1.is_left_child.return_value = True
-                parent_of_split_node2.assert_has_calls()
+        mock_found_split2 = unittest.mock.PropertyMock(return_value=True)
+        update_leaf_call2 = unittest.mock.call(best_node_before_split2, best_node_after_split2)
+        type(mock_node_split_result2).found_split = mock_found_split2
+        type(mock_node_split_result2).best_node_before_split = best_node_before_split2
+        type(mock_node_split_result2).best_node_after_split = best_node_after_split2
+        type(best_node_before_split2).parent = best_node_after_split1
+        type(best_node_before_split2).is_left_child = False
+        mock_set_right_child = unittest.mock.PropertyMock()
+        type(best_node_after_split1).right_child = mock_set_right_child
+        type(best_node_after_split1).split_feature = split_feature1
+        type(best_node_after_split2).height = 3
 
-        self.node_splitter.split.return_value = mock_node_split_result2
-
-        split_succeeded = self.binary_decision_tree.try_add_best_split()
+        split_succeeded2 = self.binary_decision_tree.try_add_best_split()
 
         self.feature_subsetter.subset.assert_has_calls([subset_call2])
         self.leaf_nodes.get_leaf_nodes.assert_has_calls([get_leaf_nodes_call2])
         self.node_splitter.split.assert_has_calls([split_call2])
         mock_leaf_nodes2.assert_not_called()
-        mock_node_split_result2.found_split.assert_called_once()
-        self.assertTrue(split_succeeded)
+        mock_found_split2.assert_called_once()
+        self.leaf_nodes.update_leaf_node_split.assert_has_calls([update_leaf_call2])
+        mock_set_right_child.assert_called_once = best_node_before_split2
+        self.assertTrue(split_succeeded2)
         self.assertEqual(self.binary_decision_tree.get_max_height(), 3)
-        """
 
     def test__try_add_best_split__unsuccessful_split__does_nothing(self):
         allowed_features = ["allowed_feature"]

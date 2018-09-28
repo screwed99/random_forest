@@ -46,8 +46,8 @@ class BinaryDecisionTree:
         self._used_features.add(best_node_after_split.split_feature)
         self._leaf_nodes.update_leaf_node_split(best_node_before_split=best_node_before_split,
                                                 best_node_after_split=best_node_after_split)
-        if best_node_after_split.left_child.height > self._max_height:
-            self._max_height = best_node_after_split.left_child.height
+        if best_node_after_split.height > self._max_height:
+            self._max_height = best_node_after_split.height
 
 
 class BinaryDecisionTreeFactory:
